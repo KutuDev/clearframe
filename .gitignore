@@ -1,0 +1,27 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+public/ffmpeg/
+
+# Browser/local processing output
+clearframe-jobs/
+before.mp4
+after.mp4
+*-denoised.wav
+*-denoised.mp4
+*-analysis.wav
+*-spectrum.png
+*-benchmark.json
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Native engine download: release it only through the audited web model package
+deep-filter.exe
