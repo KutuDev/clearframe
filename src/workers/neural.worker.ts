@@ -2,10 +2,10 @@
 import { DeepFilter } from '@lofcz/deepfilternet-web';
 import neuralWasmUrl from '@lofcz/deepfilternet-web/df_bg.wasm?url';
 
-type Request = { samples: ArrayBuffer };
+type Request = { samples: ArrayBuffer; offset: number; length: number };
 self.onmessage = async ({ data }: MessageEvent<Request>) => {
   try {
-    const input = new Float32Array(data.samples);
+    const input = new Float32Array(data.samples, data.offset, data.length);
     const filter = await DeepFilter.create({ wasmUrl: neuralWasmUrl, attenuationLimit: 100 });
     filter.setPostFilterBeta(0.02);
     const output = new Float32Array(input.length);

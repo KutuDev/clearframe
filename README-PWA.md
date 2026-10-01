@@ -26,7 +26,8 @@ DeepFilterNet3 is bundled into the build as a self-contained WASM asset. The
 worker never falls back to the prior FFT algorithm: a failed model initialization
 is surfaced to the user rather than producing lower-quality output.
 
-The browser-side pipeline accepts MP4, M4A, and WAV up to 500 MB. FFmpeg.wasm
+The browser-side pipeline accepts MP4, M4A, and WAV within a device-aware size
+and duration limit. FFmpeg.wasm
 extracts 48 kHz mono PCM, the DeepFilterNet worker processes it in fixed-size
 frames, and FFmpeg.wasm emits a single AAC encode. MP4 video packets are copied
 without re-encoding. WAV exports remain lossless.
@@ -34,7 +35,11 @@ without re-encoding. WAV exports remain lossless.
 After neural cleanup, a peak-safe 5 dB makeup-gain stage restores the program
 level used by the benchmark without clipping already-loud recordings.
 
-The 500 MB limit is intentional: the current FFmpeg.wasm file-system adapter
-needs encoded and decoded audio in browser memory. It is a production safety
-limit, not an upload limit—media is never sent to Vercel. A future streaming
-WebCodecs/OPFS exporter can raise it without changing the neural model.
+The current FFmpeg.wasm file-system adapter keeps encoded media and decoded
+audio in browser memory. The app checks metadata before loading either WASM
+engine: devices reporting at least 8 GB get 120 MB / 10 minutes; those
+reporting at least 4 GB get 60 MB / 4 minutes; smaller or unknown devices get
+25 MB / 2 minutes. These conservative limits are processing safeguards, not
+upload limits—media is never sent to Vercel. Cancel terminates the active
+FFmpeg and neural workers. A future streaming WebCodecs/OPFS exporter can
+raise the limits without changing the neural model.
